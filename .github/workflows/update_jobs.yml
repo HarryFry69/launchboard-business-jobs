@@ -23,7 +23,7 @@ jobs:
         env:
           ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
           ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
-        run: python collector_adzuna.py
+        run: python collector_combined.py
 
       - name: Commit updated feed
         run: |
