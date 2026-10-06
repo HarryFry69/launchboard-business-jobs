@@ -15,6 +15,18 @@ def norm(s):
     return re.sub(r"[^a-z0-9]+", "", (s or "").lower()
                   .replace("limited", "").replace("ltd", "").replace("plc", ""))
 
+def company_key(name):
+    n = norm(name)
+    aliases = {
+        "bdouk": "bdo",
+        "pricewaterhousecoopers": "pwc",
+        "ernstyoung": "ey",
+        "grantthorntonuk": "grantthornton",
+        "rsmuk": "rsm",
+        "forvismazarsuk": "forvismazars",
+    }
+    return aliases.get(n, n)
+
 def loc_key(loc):
     s = (loc or "").lower()
     hits = [c for c in CITIES if c in s]
@@ -26,7 +38,7 @@ def loc_key(loc):
 
 def key(j):
     title = re.sub(r"\b202[6-8]\b", "", j.get("title", ""), flags=re.I)
-    return (norm(j.get("company")), norm(title), loc_key(j.get("location")))
+    return (company_key(j.get("company")), norm(title), loc_key(j.get("location")))
 
 def collect_priority():
     p = Path(__file__).with_name("priority_jobs.json")
