@@ -192,7 +192,9 @@ def relevant(title, desc):
         "fintech", "payments", "market analysis", "market research",
         "business transformation", "change management", "advisory", "deals",
         "transaction advisory", "transaction services", "corporate finance",
-        "restructuring", "forensics", "risk", "assurance", "audit", "tax"
+        "restructuring", "forensics", "risk", "assurance", "audit", "tax",
+        "graduate analyst", "analyst programme", "planning economics",
+        "operational capital markets", "project consultancy"
     ]
     return any(x in h for x in desired)
 
@@ -202,6 +204,28 @@ def category(text):
         if any(k in t for k in keys):
             return name
     return "Commercial"
+
+def category_for(title, desc):
+    t = title.lower()
+    # Prefer the title so a sales role mentioning "consulting services" doesn't
+    # get mislabelled as consulting.
+    title_rules = [
+        ("Deals & Corporate Finance", ["deal", "transaction", "corporate finance", "restructuring", "forensic"]),
+        ("Risk & Assurance", ["risk", "audit", "assurance", "compliance"]),
+        ("Tax", ["tax"]),
+        ("Business Development & Sales", ["business development", "sales development", "account executive", "sdr", "bdr"]),
+        ("Recruitment & Executive Search", ["recruitment", "recruiter", "executive search"]),
+        ("Revenue & Commercial Operations", ["revenue operations", "commercial analyst", "sales operations"]),
+        ("Business Analysis & Insights", ["business analyst", "market analyst", "insights analyst"]),
+        ("Project & Change", ["project management", "project coordinator", "change"]),
+        ("Operations & Management", ["operations", "management graduate", "graduate management", "management trainee"]),
+        ("Strategy & Consulting", ["strategy", "consultant", "consulting"]),
+        ("Financial Services", ["financial services", "financial markets", "capital markets", "banking"]),
+    ]
+    for name, keys in title_rules:
+        if any(k in t for k in keys):
+            return name
+    return category(title + " " + desc)
 
 def sector(text):
     t = text.lower()
@@ -369,7 +393,7 @@ def make_job(x):
         "company": company,
         "initials": "".join(w[0] for w in company.split()[:2]).upper(),
         "title": title,
-        "category": category(title + " " + desc),
+        "category": category_for(title, desc),
         "location": loc,
         "workplace": "Check listing",
         "salary": sal,
@@ -384,7 +408,7 @@ def make_job(x):
         "sector": sector(title + " " + desc),
         "url": x.get("redirect_url") or "https://www.adzuna.co.uk/",
         "reason": " · ".join(reasons[:4]) or "Potential business / commercial match",
-        "tags": [category(title + " " + desc), sector(title + " " + desc), "UK", "Graduate / Entry Level"],
+        "tags": [category_for(title, desc), sector(title + " " + desc), "UK", "Graduate / Entry Level"],
         "summary": desc[:500] + ("…" if len(desc) > 500 else ""),
         "fit": reasons[:6] or ["Potential business / commercial match"],
         "caution": "Confirm exact start date, degree criteria and experience requirements on the original listing."
