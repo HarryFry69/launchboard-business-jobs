@@ -39,8 +39,10 @@ EARLY = [
 TITLE_EXCLUDE = [
     "internship", "summer intern", "placement", "apprentice",
     "software engineer", "software developer", "data engineer",
-    "data scientist", "machine learning", "quant developer",
-    "quant researcher", "quantitative researcher", "algorithmic trader",
+    "data scientist", "machine learning", "technology analyst", "ai & data",
+    "ai and data", "digital engineering", "software technology", "cyber security",
+    "cybersecurity", "quant developer", "quant researcher",
+    "quantitative researcher", "algorithmic trader",
     "doctor", "nurse", "solicitor", "lawyer", "architect"
 ]
 
@@ -305,27 +307,35 @@ def score_job(title, desc):
     h = blob(title, desc)
     if hard_excluded(title) or not relevant(title, desc):
         return 0
-    score = 34
 
+    score = 30
+
+    # Eligibility / timing signal.
     if "2027" in h:
-        score += 13
-    if "graduate" in h:
-        score += 19
-    if "entry level" in h or "entry-level" in h:
-        score += 17
-    if "no experience" in h:
-        score += 13
-    if "trainee" in h:
         score += 10
-    if "junior" in h:
+    if "graduate" in h:
+        score += 20
+    elif "entry level" in h or "entry-level" in h:
+        score += 17
+    elif "no experience" in h:
+        score += 13
+    elif "trainee" in h:
+        score += 10
+    elif "junior" in h:
         score += 8
 
-    for k, v in ROLE_WEIGHTS:
-        if k in h:
-            score += v
-    for k, v in PROFILE_WEIGHTS:
-        if k in h:
-            score += v
+    # Role family is the biggest determinant, but don't double-count every
+    # synonym in the same advert.
+    role_hits = sorted([v for k, v in ROLE_WEIGHTS if k in h], reverse=True)
+    if role_hits:
+        score += role_hits[0]
+        if len(role_hits) > 1:
+            score += min(8, sum(role_hits[1:]) // 6)
+
+    # CV-evidenced transferable skills matter, but are capped so generic
+    # wording cannot turn every graduate role into a 99% match.
+    profile_points = sum(v for k, v in PROFILE_WEIGHTS if k in h)
+    score += min(10, profile_points)
 
     yrs = experience_years(h)
     if yrs >= 3:
@@ -335,13 +345,20 @@ def score_job(title, desc):
     elif yrs == 1:
         score -= 15
 
-    # Lower priority than the roles evidenced by the CV, but still potentially useful.
-    if any(x in h for x in ["audit", "tax graduate", "accounting graduate", "actuarial"]):
-        score -= 15
+    # Professional-services routes are eligible but less directly aligned
+    # than strategy/consulting/deals unless the role has stronger matching
+    # signals elsewhere.
+    if "audit" in h:
+        score -= 3
+    if re.search(r"\btax\b", h):
+        score -= 5
+    if "actuarial" in h:
+        score -= 7
+
     if any(x in h for x in ["engineering degree", "computer science degree", "stem degree required"]):
         score -= 22
 
-    return max(0, min(99, score))
+    return max(0, min(94, score))
 
 def salary_text(x):
     lo = x.get("salary_min")
