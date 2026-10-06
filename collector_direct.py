@@ -8,7 +8,10 @@ LEVER=[('Zopa','zopa'),('Bisnow','bisnow'),('Samba TV','sambatv')]
 TEAMTAILOR=[('Metric','metricsearch-1723476068.teamtailor.com'),('Leyton','leyton.teamtailor.com'),('Codestone','codestone.teamtailor.com'),('Shuffle','shuffle.teamtailor.com')]
 PINPOINT=[('MNI Markets','mnimarkets')]
 UK=['united kingdom',' uk','london','manchester','birmingham','leeds','bristol','reading','edinburgh','glasgow','cardiff','nottingham','newcastle','liverpool','sheffield','oxford','cambridge','brighton','bournemouth','swindon','stevenage','croydon','wales','scotland','england','northern ireland']
-EXCLUDE=['internship','summer intern','placement','apprentice','software engineer','software developer','developer','data engineer','machine learning','quant developer','quant research','algorithmic trader','director','vice president','head of','principal','senior manager']
+EXCLUDE=['internship','summer intern','placement','apprentice','software engineer','software developer','developer','data engineer','machine learning','quant developer','quant research','algorithmic trader','director','vice president','head of','principal','senior manager','country lead']
+EARLY=['graduate','entry level','entry-level','junior','trainee','no experience','early career','early-career','school leaver']
+DESIRED=['business development','sales development representative','sdr','bdr','revenue operations','commercial','business analyst','operations analyst','strategy analyst','graduate analyst','consultant','consulting','recruitment consultant','executive search','account executive','partnerships']
+SENIOR_TITLE=['senior','lead ','manager','director','head of','principal','vice president','vp ']
 
 def get_json(url):
     req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'application/json'})
@@ -23,12 +26,28 @@ def text(s):
     return re.sub(r'\s+',' ',html.unescape(s)).strip()
 
 def uk(loc,desc=''):
-    h=(' '+(loc or '')+' '+(desc or '')[:1500]).lower()
+    l=(' '+(loc or '')).lower()
+    if loc and loc.strip():
+        return any(x in l for x in UK)
+    h=(' '+(desc or '')[:1200]).lower()
     return any(x in h for x in UK)
 
 def bad(title,desc=''):
-    h=((title or '')+' '+(desc or '')[:2500]).lower()
-    return any(x in h for x in EXCLUDE)
+    t=(title or '').lower()
+    h=(t+' '+(desc or '')[:2500]).lower()
+    if any(x in h for x in EXCLUDE): return True
+    if any(x in t for x in SENIOR_TITLE) and not any(x in t for x in EARLY): return True
+    return False
+
+def early_relevant(title,desc=''):
+    t=(title or '').lower()
+    h=(t+' '+(desc or '')[:3000]).lower()
+    if not any(x in h for x in DESIRED): return False
+    if any(x in h for x in EARLY): return True
+    if any(x in t for x in ['business development representative','business development executive','sales development representative','revenue operations analyst','business analyst','commercial analyst','associate consultant']):
+        if re.search(r'\b(?:[1-9]|one|two|three|four|five)\+?\s+years?\b',h): return False
+        return True
+    return False
 
 def salary(desc):
     vals=[]
@@ -49,8 +68,9 @@ def iso_date(v):
         except:return ''
 
 def convert(*,uid,company,title,loc,desc,url,source,created='',salary_min=None,salary_max=None,workplace='Check listing',deadline=None):
-    title=adz.clean(title); loc=adz.clean(loc) or 'United Kingdom'; desc=text(desc)
-    if not title or not url or not uk(loc,desc) or bad(title,desc):return None
+    title=adz.clean(title); raw_loc=adz.clean(loc); desc=text(desc)
+    if not title or not url or not uk(raw_loc,desc) or bad(title,desc) or not early_relevant(title,desc):return None
+    loc=raw_loc or 'United Kingdom'
     if salary_min is None and salary_max is None:salary_min,salary_max=salary(desc)
     raw={'id':uid,'title':title,'description':desc,'company':{'display_name':company},'location':{'display_name':loc},'salary_min':salary_min,'salary_max':salary_max,'created':iso_date(created),'redirect_url':url}
     j=adz.make_job(raw)
@@ -100,7 +120,7 @@ def teamtailor():
                 for ch in item:
                     if ch.tag.endswith('encoded') and ch.text:desc+=' '+ch.text
                 plain=text(desc); m=re.search(r'(?:Location|Locations):\s*([^|•\n<]{2,100})',plain,re.I)
-                loc=m.group(1).strip() if m else ('London' if 'london' in plain.lower() else 'United Kingdom')
+                loc=m.group(1).strip() if m else ('London' if 'london' in plain.lower() else '')
                 j=convert(uid=f'tt-{host}-{abs(hash(link))}',company=company,title=title,loc=loc,desc=plain,url=link.rstrip('/')+'/applications/new' if link else '',source=f'Teamtailor · {company}',created=item.findtext('pubDate') or '')
                 if j:out.append(j)
         except Exception as e:print('Teamtailor',company,e)
