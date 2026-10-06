@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "collector_*.py"
+      - "priority_jobs.json"
   schedule:
     - cron: "17 */4 * * *"
 
