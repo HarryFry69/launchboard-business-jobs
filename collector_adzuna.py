@@ -16,18 +16,19 @@ OUT = Path(__file__).with_name("jobs.json")
 # Keep this at 12 queries: 6 runs/day ~= 2,160 calls/month, inside the
 # standard 2,500/month Adzuna allowance.
 QUERIES = [
+    "Deloitte graduate",
+    "PwC graduate",
+    "EY graduate",
+    "KPMG graduate",
+    "graduate consulting",
+    "graduate advisory",
     "graduate strategy",
-    "graduate consultant",
-    "graduate business analyst",
+    "graduate business",
     "graduate commercial",
     "graduate operations",
     "graduate management",
+    "graduate financial services",
     "graduate business development",
-    "graduate sales",
-    "revenue operations analyst",
-    "graduate recruitment consultant",
-    "graduate client services",
-    "graduate project management",
 ]
 
 EARLY = [
@@ -81,10 +82,32 @@ ROLE_WEIGHTS = [
     ("financial markets", 11),
     ("fintech", 11),
     ("payments", 9),
+    ("advisory", 14),
+    ("deal advisory", 16),
+    ("transaction advisory", 17),
+    ("transaction services", 16),
+    ("corporate finance", 15),
+    ("restructuring", 12),
+    ("forensics", 10),
+    ("risk advisory", 12),
+    ("risk consulting", 13),
+    ("audit", 5),
+    ("assurance", 5),
+    ("tax", 3),
 ]
 
 # Skills evidenced in the CV. These are light bonuses; role family and
 # eligibility remain more important than generic soft-skill wording.
+PRIORITY_EMPLOYERS = {
+    "deloitte": 10, "pwc": 10, "pricewaterhousecoopers": 10,
+    "ey": 10, "ernst young": 10, "kpmg": 10,
+    "bdo": 8, "grant thornton": 8, "accenture": 8, "capgemini": 7,
+    "rsm": 7, "forvis mazars": 7, "mazars": 7, "protiviti": 8,
+    "oliver wyman": 9, "kearney": 9, "mckinsey": 10, "boston consulting group": 10,
+    "bain": 10, "strategy&": 10, "lseg": 8, "london stock exchange group": 8,
+    "barclays": 6, "bny": 6, "howden": 6, "zopa": 6
+}
+
 PROFILE_WEIGHTS = [
     ("relationship", 4),
     ("client", 4),
@@ -106,7 +129,10 @@ PROFILE_WEIGHTS = [
 ]
 
 CATS = [
-    ("Strategy & Consulting", ["strategy", "consultant", "consulting", "advisory"]),
+    ("Strategy & Consulting", ["strategy", "consultant", "consulting", "management consulting"]),
+    ("Deals & Corporate Finance", ["deal advisory", "deals", "transaction advisory", "transaction services", "corporate finance", "restructuring", "forensics"]),
+    ("Risk & Assurance", ["risk advisory", "risk consulting", "governance", "assurance", "audit"]),
+    ("Tax", ["tax graduate", "tax associate", "tax trainee"]),
     ("Business Analysis & Insights", ["business analyst", "market analysis", "market research", "insights analyst"]),
     ("Revenue & Commercial Operations", ["revenue operations", "revops", "commercial analyst", "sales operations"]),
     ("Business Development & Sales", ["business development", "sales development", "account executive", "growth executive"]),
@@ -164,7 +190,9 @@ def relevant(title, desc):
         "management graduate", "graduate management", "partnership",
         "procurement", "supply chain", "financial services", "financial markets",
         "fintech", "payments", "market analysis", "market research",
-        "business transformation", "change management"
+        "business transformation", "change management", "advisory", "deals",
+        "transaction advisory", "transaction services", "corporate finance",
+        "restructuring", "forensics", "risk", "assurance", "audit", "tax"
     ]
     return any(x in h for x in desired)
 
@@ -181,8 +209,8 @@ def sector(text):
         return "Financial Services / FinTech"
     if any(k in t for k in ["recruitment", "executive search", "staffing"]):
         return "Recruitment / Executive Search"
-    if any(k in t for k in ["consulting", "consultant", "advisory"]):
-        return "Consulting / Advisory"
+    if any(k in t for k in ["consulting", "consultant", "advisory", "deals", "transaction"]):
+        return "Professional Services / Advisory"
     if any(k in t for k in ["property", "real estate", "surveying"]):
         return "Real Estate / Property"
     if any(k in t for k in ["software", "saas", "technology", "tech company"]):
@@ -227,6 +255,10 @@ def fit_reasons(title, desc):
     reasons = []
     if any(x in h for x in ["strategy", "consulting", "consultant", "business transformation"]):
         reasons.append("Consulting / strategy aligned")
+    if any(x in h for x in ["advisory", "deals", "transaction advisory", "corporate finance", "restructuring"]):
+        reasons.append("Professional-services / deals aligned")
+    if any(x in h for x in ["risk", "audit", "assurance", "tax"]):
+        reasons.append("Big Four-style professional qualification route")
     if any(x in h for x in ["business development", "sales development", "commercial", "revenue operations"]):
         reasons.append("Commercial / growth aligned")
     if any(x in h for x in ["financial services", "financial markets", "fintech", "payments", "banking"]):
@@ -319,10 +351,15 @@ def make_job(x):
     h = blob(title, desc)
     s = score_job(title, desc)
     e = eligibility(title, desc)
+    company_l = company.lower()
+    employer_bonus = max([v for k, v in PRIORITY_EMPLOYERS.items() if k in company_l] or [0])
+    s = min(99, s + employer_bonus)
     created = x.get("created") or ""
     age = age_days(created)
     ident = str(x.get("id") or abs(hash((title, company, loc))))
     reasons = fit_reasons(title, desc)
+    if employer_bonus:
+        reasons.append("Priority graduate employer")
     if salmax:
         reasons.append("Salary disclosed")
     reasons = list(dict.fromkeys(reasons))
