@@ -43,7 +43,7 @@ UK = [
 
 DIRECT_TITLE_EXCLUDE = [
     "internship", "summer intern", "placement", "apprentice",
-    "networking", "workshop", "office visit", "case challenge",
+    "intern", "networking", "workshop", "office visit", "case challenge",
     "guest lecture", "dinner", "insight day", "open evening",
     "register your interest", "talent community"
 ]
@@ -72,9 +72,18 @@ def uk(loc, desc=""):
 
 def early_relevant(title, desc=""):
     t = (title or "").lower()
+    short = (t + " " + (desc or "")[:1400]).lower()
     h = (t + " " + (desc or "")[:5000]).lower()
 
     if any(x in t for x in DIRECT_TITLE_EXCLUDE):
+        return False
+    title_job_signal = any(x in t for x in [
+        "graduate", "entry level", "entry-level", "junior", "trainee",
+        "analyst", "consultant", "business development", "sales development",
+        "account executive", "operations", "commercial", "recruitment",
+        "project", "advisory", "risk", "audit", "tax", "capital markets"
+    ])
+    if not title_job_signal:
         return False
     if adz.hard_excluded(title):
         return False
@@ -88,7 +97,9 @@ def early_relevant(title, desc=""):
     # Direct feeds can include thousands of experienced jobs. Require a clear
     # early-career signal, or a genuinely junior commercial title with no
     # experience requirement.
-    if any(x in h for x in adz.EARLY) or "2027" in h:
+    if any(x in t for x in ["graduate", "entry level", "entry-level", "junior", "trainee"]) or "2027" in t:
+        return True
+    if any(x in short for x in ["recent graduate", "ambitious graduate", "graduates welcome", "no experience", "early career", "early-career", "0-1 year", "0–1 year"]):
         return True
 
     junior_titles = [
