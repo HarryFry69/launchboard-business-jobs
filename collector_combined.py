@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json, re, time
+from datetime import date
 from pathlib import Path
 import collector_adzuna as adz
 from collector_direct import collect_direct
@@ -40,6 +41,29 @@ def key(j):
     title = re.sub(r"\b202[6-8]\b", "", j.get("title", ""), flags=re.I)
     return (company_key(j.get("company")), norm(title), loc_key(j.get("location")))
 
+def current_listing(j, today=None):
+    today = today or date.today()
+    cutoff = j.get("deadline") or j.get("expiresAt")
+    if cutoff and re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", str(cutoff)):
+        try:
+            return date.fromisoformat(cutoff) >= today
+        except ValueError:
+            return False
+    return True
+
+def collect_featured():
+    p = Path(__file__).with_name("featured_jobs.json")
+    if not p.exists():
+        return []
+    try:
+        jobs = json.loads(p.read_text(encoding="utf-8"))
+        live = [j for j in jobs if isinstance(j, dict) and j.get("url") and current_listing(j)]
+        print("Researched roles (dated, not continuously verified):", len(live))
+        return live
+    except (OSError, ValueError) as e:
+        print("Featured roles ERROR", e)
+        return []
+
 def collect_priority():
     p = Path(__file__).with_name("priority_jobs.json")
     if not p.exists():
@@ -48,7 +72,7 @@ def collect_priority():
         rows = json.loads(p.read_text(encoding="utf-8"))
         out = []
         for j in rows if isinstance(rows, list) else []:
-            if not isinstance(j, dict) or not j.get("title") or not j.get("url"):
+            if not isinstance(j, dict) or not j.get("title") or not j.get("url") or not current_listing(j):
                 continue
             j["direct"] = True
             j.setdefault("source", "Official employer")
@@ -83,6 +107,7 @@ def collect_adzuna():
     return list(found.values())
 
 def main():
+    featured = collect_featured()
     priority = collect_priority()
     direct = collect_direct()
     broad = collect_adzuna()
@@ -90,7 +115,9 @@ def main():
 
     # Prefer a direct ATS version when two records are materially the same,
     # but never allow a weak direct job to outrank a much stronger fit.
-    for j in priority + direct + broad:
+    for j in featured + priority + direct + broad:
+        if not current_listing(j):
+            continue
         k = key(j)
         old = merged.get(k)
         if old is None:
@@ -110,7 +137,7 @@ def main():
         j.get("company", ""),
         j.get("location", "")
     ))
-    jobs = jobs[:350]
+    jobs = jobs[:450]
 
     if not jobs:
         print("No jobs; keeping old feed")
