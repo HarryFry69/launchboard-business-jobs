@@ -57,7 +57,15 @@ tbody tr:hover{background:#eef7ff}
 .directory-tools{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}
 .directory-tools input,.directory-tools select{padding:9px;border:1px solid #cfd5dc;border-radius:5px;min-width:190px}
 .export-button{border:1px solid #cfd5dc;background:#fff;padding:7px 11px;border-radius:5px;cursor:pointer;font-weight:bold}
-.employer-table{min-width:750px}
+.employer-table{min-width:1150px}
+.directory-note{max-width:230px;min-width:140px;padding:5px;font-size:11px;border:1px solid #cfd5dc;border-radius:4px}
+.directory-status{min-width:110px;padding:5px;font-size:11px;border:1px solid #cfd5dc;border-radius:4px}
+.directory-actions{display:flex;gap:6px;flex-wrap:wrap}
+.directory-actions a{font-size:11px;text-decoration:none;border:1px solid #c7d2df;padding:6px;border-radius:4px;color:#173e8f;font-weight:700;white-space:nowrap}
+.directory-actions a.primary{background:#173e8f;color:#fff;border-color:#173e8f}
+.directory-tools strong{padding:10px;color:#17315f;font-size:12px}
+@media(max-width:900px){.directory-tools input,.directory-tools select{min-width:145px;max-width:100%}}
+
 .note-input{width:180px;padding:6px;border:1px solid #d0d5dd;border-radius:4px;font-size:11px}
 @media(max-width:900px){
  .control-grid{grid-template-columns:1fr 1fr}.hero h1{font-size:25px}.wrap{padding:10px}
@@ -132,9 +140,9 @@ tbody tr:hover{background:#eef7ff}
   </div>
   </div>
   <section id="employersPanel" hidden>
-   <p><strong>Target employers:</strong> Research boutique brokers, specialist PR agencies and wealth firms. These careers pages are not guarantees of current vacancies; check before applying.</p>
-   <div class="directory-tools"><input id="employerSearch" placeholder="Search employer or town..."><select id="employerSector"><option value="">All sectors</option><option>Insurance &amp; Broking</option><option>PR &amp; Communications</option><option>Wealth Management &amp; Financial Planning</option></select><select id="employerKind"><option value="">All firms</option><option value="independent">Independent / boutique only</option></select><strong id="employerCount"></strong></div>
-   <div class="table-shell"><table class="employer-table"><thead><tr><th>Employer</th><th>Sector</th><th>Location</th><th>Type</th><th>Why consider</th><th>Careers</th></tr></thead><tbody id="employerRows"></tbody></table></div>
+   <p><strong>Research target employers — NOT confirmed vacancies.</strong> Independent firms and boutique agency candidates sourced from industry rankings. Some links are original careers pages; others are the industry listing used to identify the firm. Use <strong>Find jobs</strong> to research junior, trainee or graduate openings. Track outreach and save notes in this browser.</p>
+   <div class="directory-tools"><input id="employerSearch" placeholder="Search employer or town..."><select id="employerSector"><option value="">All sectors</option><option>Insurance &amp; Broking</option><option>PR &amp; Communications</option><option>Wealth Management &amp; Financial Planning</option></select><select id="employerKind"><option value="">All firms</option><option value="independent">Boutique / small firms only</option></select><select id="employerTrackingFilter"><option value="">All outreach statuses</option><option value="Shortlisted">Shortlisted</option><option value="Researching">Researching</option><option value="Contacted">Contacted</option><option value="Applied">Applied</option></select><button id="exportEmployers" class="export-button">Export employers CSV ↓</button><strong id="employerCount"></strong></div>
+   <div class="table-shell"><table class="employer-table"><thead><tr><th>Employer</th><th>Sector</th><th>Location</th><th>Type</th><th>Research basis</th><th>Outreach status</th><th>My notes</th><th>Company links</th></tr></thead><tbody id="employerRows"></tbody></table></div>
   </section>
   <div class="footer">Personal job tracker. CV Match and eligibility are estimates, not guarantees. Checked roles expire automatically; confirm every vacancy and start date on the employer website. Application links open the original listing; DIRECT marks employer/ATS sources. Saved/application status is stored in this browser. Aggregated listings: Jobs by <a href="https://www.adzuna.co.uk/" target="_blank" rel="noopener">Adzuna</a>.</div>
 </div>
@@ -146,6 +154,8 @@ const store={
  set(k,v){localStorage.setItem(k,JSON.stringify(v))}
 };
 let employers=[];
+let employerStatuses=store.get('lb_employer_statuses');if(!employerStatuses||Array.isArray(employerStatuses))employerStatuses={};
+let employerNotes=store.get('lb_employer_notes');if(!employerNotes||Array.isArray(employerNotes))employerNotes={};
 let trackedArchive=store.get('lb_tracked_archive');if(!trackedArchive||Array.isArray(trackedArchive))trackedArchive={};
 let userNotes=store.get('lb_personal_notes');if(!userNotes||Array.isArray(userNotes))userNotes={};
 let state={tab:'all',saved:store.get('lb_saved'),applied:store.get('lb_applied'),statuses:store.get('lb_statuses')||{}};
@@ -241,12 +251,43 @@ function render(){
 }
 
 function renderEmployers(){
- const q=$('employerSearch').value.toLowerCase(),cat=$('employerSector').value;
- const only=$('employerKind').value;
- let list=employers.filter(e=>(!cat||e.category===cat)&&(!only||e.independent));
- if(q)list=list.filter(e=>[e.name,e.location,e.type,e.note].join(' ').toLowerCase().includes(q));
- $('employerCount').textContent=list.length+' companies';
- $('employerRows').innerHTML=list.map(e=>'<tr><td class="company">'+esc(e.name)+'</td><td>'+esc(e.category)+'</td><td>'+esc(e.location)+'</td><td>'+esc(e.type)+'</td><td>'+esc(e.note)+'</td><td class="apply"><a href="'+esc(e.url)+'" target="_blank" rel="noopener">Careers ↗</a></td></tr>').join('')||'<tr><td colspan="6" class="empty">No companies found.</td></tr>';
+ const q=$('employerSearch').value.toLowerCase().trim(),cat=$('employerSector').value;
+ const only=$('employerKind').value,tracked=$('employerTrackingFilter').value;
+ let list=employers.filter(e=>(!cat||e.category===cat)&&(!only||e.independent)&&(!tracked||employerStatuses[e.name]===tracked));
+ if(q)list=list.filter(e=>[e.name,e.location,e.type,e.note,e.sourceName||'',employerNotes[e.name]||''].join(' ').toLowerCase().includes(q));
+ list.sort((a,b)=>(employerStatuses[a.name]?0:1)-(employerStatuses[b.name]?0:1)|| (a.independent===b.independent?0:(a.independent?-1:1)) || a.name.localeCompare(b.name));
+ const base=employers.filter(e=>!only||e.independent);
+ $('employerCount').textContent=list.length+' displayed / '+base.length+' total';
+ const statuses=['Not started','Shortlisted','Researching','Contacted','Applied','Not suitable'];
+ $('employerRows').innerHTML=list.map(e=>{
+   const status=employerStatuses[e.name]||'Not started';
+   const search='https://www.google.com/search?q='+encodeURIComponent('"'+e.name+'" careers graduate junior trainee UK');
+   const verified=e.linkType==='careers';
+   const primary=verified?'<a class="primary" href="'+esc(e.url)+'" target="_blank" rel="noopener">Careers ↗</a>':'';
+   const research='<a href="'+esc(search)+'" target="_blank" rel="noopener">Find jobs ↗</a>';
+   const source=e.sourceUrl?'<a href="'+esc(e.sourceUrl)+'" target="_blank" rel="noopener" title="'+esc(e.sourceName||'Source')+'">Source ↗</a>':'';
+   return '<tr><td class="company">'+esc(e.name)+(e.independent?' <span class="badge">SMALL</span>':'')+'</td>'+
+     '<td>'+esc(e.category)+'</td><td>'+esc(e.location)+'</td><td>'+esc(e.type)+'</td>'+
+     '<td class="note">'+esc(e.sourceName||e.note||'Research target')+'</td>'+
+     '<td><select class="directory-status" data-employer-status="'+esc(e.name)+'">'+statuses.map(v=>'<option'+(v===status?' selected':'')+'>'+esc(v)+'</option>').join('')+'</select></td>'+
+     '<td><input class="directory-note" data-employer-note="'+esc(e.name)+'" value="'+esc(employerNotes[e.name]||'')+'" placeholder="Contact name, next step..."></td>'+
+     '<td><div class="directory-actions">'+primary+research+source+'</div></td></tr>';
+ }).join('')||'<tr><td colspan="8" class="empty">No companies match those filters.</td></tr>';
+ document.querySelectorAll('[data-employer-status]').forEach(el=>el.onchange=()=>{
+   if(el.value==='Not started')delete employerStatuses[el.dataset.employerStatus];else employerStatuses[el.dataset.employerStatus]=el.value;
+   store.set('lb_employer_statuses',employerStatuses);renderEmployers();
+ });
+ document.querySelectorAll('[data-employer-note]').forEach(el=>el.onchange=()=>{
+   employerNotes[el.dataset.employerNote]=el.value;store.set('lb_employer_notes',employerNotes);
+ });
+}
+function exportEmployers(){
+ const headers=['Employer','Sector','Area','Firm type','Outreach status','Notes','Website or directory source','Source label','Link type'];
+ const rows=employers.map(e=>[e.name,e.category,e.location,e.type,employerStatuses[e.name]||'Not started',employerNotes[e.name]||'',e.url,e.sourceName||'',e.linkType||'careers']);
+ const csvEscape=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+ const csv=[headers,...rows].map(r=>r.map(csvEscape).join(',')).join('\r\n');
+ const url=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
+ const anchor=document.createElement('a');anchor.href=url;anchor.download='launchboard-boutique-employers.csv';anchor.click();setTimeout(()=>URL.revokeObjectURL(url),5000);
 }
 function switchTab(){
  const dir=state.tab==='employers';$('jobsPanel').hidden=dir;$('employersPanel').hidden=!dir;
@@ -265,7 +306,8 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
  state.tab=b.dataset.tab;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));switchTab()
 });
 ['search','category','employerType','location','minscore','sort','directOnly','only2027'].forEach(id=>$(id).addEventListener('input',render));
-['employerSearch','employerSector','employerKind'].forEach(id=>$(id).addEventListener('input',renderEmployers));
+['employerSearch','employerSector','employerKind','employerTrackingFilter'].forEach(id=>$(id).addEventListener('input',renderEmployers));
+$('exportEmployers').onclick=exportEmployers;
 $('exportTracker').onclick=exportTracker;
 async function boot(){
  if(location.protocol!=='file:'){
