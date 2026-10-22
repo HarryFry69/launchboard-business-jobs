@@ -13,23 +13,54 @@ APP_ID = os.environ["ADZUNA_APP_ID"]
 APP_KEY = os.environ["ADZUNA_APP_KEY"]
 OUT = Path(__file__).with_name("jobs.json")
 
-# Keep this at 12 queries: 6 runs/day ~= 2,160 calls/month, inside the
-# standard 2,500/month Adzuna allowance.
-QUERIES = [
-    "Deloitte graduate",
-    "PwC graduate",
-    "EY graduate",
-    "KPMG graduate",
-    "graduate consulting",
-    "graduate advisory",
-    "graduate strategy",
-    "graduate business",
-    "graduate commercial",
-    "graduate operations",
-    "graduate management",
-    "graduate financial services",
-    "graduate business development",
+# Twelve searches per 4-hour refresh (= ~2,160 calls/30 days). Preserve
+# broad graduate coverage while rotating four specialist slots so boutique
+# employers and smaller agencies are not buried by big-name graduate schemes.
+CORE_QUERIES = [
+    "graduate consulting", "graduate advisory", "graduate strategy",
+    "graduate business", "graduate commercial", "graduate operations",
+    "graduate financial services", "graduate business development",
 ]
+INSURANCE_QUERIES = [
+    "trainee insurance broker", "graduate underwriting",
+    "junior insurance account handler", "insurance graduate",
+    "trainee claims handler", "independent insurance broker trainee",
+]
+PR_QUERIES = [
+    "PR account executive", "graduate public relations",
+    "junior communications executive", "graduate PR agency",
+    "junior media relations", "boutique PR account executive",
+]
+WEALTH_QUERIES = [
+    "graduate wealth management", "trainee paraplanner",
+    "junior wealth administrator", "financial planning graduate",
+    "wealth client services associate", "investment assistant graduate",
+]
+BOUTIQUE_QUERIES = [
+    "independent financial adviser administrator",
+    "small insurance brokerage trainee",
+    "junior financial planning administrator",
+    "independent PR agency graduate",
+    "private wealth client services junior",
+    "boutique insurance account handler",
+]
+def search_queries(now=None):
+    now = now or datetime.now(timezone.utc)
+    slot = (now.toordinal() * 6 + now.hour // 4)
+    pools = [INSURANCE_QUERIES, PR_QUERIES, WEALTH_QUERIES, BOUTIQUE_QUERIES]
+    return CORE_QUERIES + [pool[slot % len(pool)] for pool in pools]
+
+QUERIES = search_queries()
+
+# Known independent/specialist practices and agencies. This is a curated
+# discovery label, NOT an estimate of employee headcount.
+BOUTIQUE_EMPLOYERS = {
+    "th march", "broker experts", "john morgan partnership",
+    "acres insurance brokers", "citynet insurance brokers",
+    "brazen pr", "fire on the hill", "eleven hundred agency",
+    "red lorry yellow lorry", "liberty pr", "mattison public relations",
+    "greenhouse communications", "glasgow wealth",
+}
 
 EARLY = [
     "graduate", "entry level", "entry-level", "junior", "trainee",
@@ -47,6 +78,24 @@ TITLE_EXCLUDE = [
 ]
 
 ROLE_WEIGHTS = [
+    ("insurance broker", 20),
+    ("insurance account handler", 18),
+    ("underwriting", 17),
+    ("underwriter", 16),
+    ("claims handler", 12),
+    ("claims analyst", 13),
+    ("public relations", 19),
+    ("pr account executive", 21),
+    ("media relations", 15),
+    ("communications executive", 15),
+    ("press officer", 12),
+    ("wealth management", 19),
+    ("financial planning", 18),
+    ("paraplanner", 16),
+    ("investment assistant", 15),
+    ("client services associate", 15),
+    ("private wealth", 17),
+    ("ifa administrator", 14),
     ("strategy", 20),
     ("management consulting", 20),
     ("strategy consulting", 22),
@@ -131,6 +180,9 @@ PROFILE_WEIGHTS = [
 ]
 
 CATS = [
+    ("Insurance & Broking", ["insurance broker", "insurance account handler", "underwriting", "underwriter", "insurance", "claims handler", "claims adjuster"]),
+    ("PR & Communications", ["public relations", "pr account", "pr executive", "media relations", "press officer", "communications agency", "corporate communications"]),
+    ("Wealth Management & Financial Planning", ["wealth management", "private wealth", "financial planning", "paraplanning", "paraplanner", "ifa administrator", "investment assistant"]),
     ("Strategy & Consulting", ["strategy", "consultant", "consulting", "management consulting"]),
     ("Deals & Corporate Finance", ["deal advisory", "deals", "transaction advisory", "transaction services", "corporate finance", "restructuring", "forensics"]),
     ("Risk & Assurance", ["risk advisory", "risk consulting", "governance", "assurance", "audit"]),
@@ -196,7 +248,14 @@ def relevant(title, desc):
         "transaction advisory", "transaction services", "corporate finance",
         "restructuring", "forensics", "risk", "assurance", "audit", "tax",
         "graduate analyst", "analyst programme", "planning economics",
-        "operational capital markets", "project consultancy"
+        "operational capital markets", "project consultancy",
+        "insurance", "underwriting", "underwriter", "broking",
+        "insurance broker", "claims handler", "claims adjuster",
+        "public relations", "pr account", "pr executive", "media relations",
+        "press officer", "communications executive", "communications agency",
+        "wealth management", "private wealth", "financial planning",
+        "paraplanner", "paraplanning", "ifa administrator",
+        "investment assistant", "portfolio assistant"
     ]
     return any(x in h for x in desired)
 
@@ -212,6 +271,9 @@ def category_for(title, desc):
     # Prefer the title so a sales role mentioning "consulting services" doesn't
     # get mislabelled as consulting.
     title_rules = [
+        ("Insurance & Broking", ["insurance", "underwrit", "broking", "claims handler", "claims adjuster"]),
+        ("PR & Communications", ["public relations", "pr account", "pr executive", "communications", "media relations", "press officer", "public affairs"]),
+        ("Wealth Management & Financial Planning", ["wealth", "financial planning", "paraplann", "ifa administrator", "investment assistant", "investment management"]),
         ("Deals & Corporate Finance", ["deal", "transaction", "corporate finance", "restructuring", "forensic"]),
         ("Risk & Assurance", ["risk", "audit", "assurance", "compliance"]),
         ("Tax", ["tax"]),
@@ -231,6 +293,12 @@ def category_for(title, desc):
 
 def sector(text):
     t = text.lower()
+    if any(k in t for k in ["insurance", "underwriting", "broking", "claims handler"]):
+        return "Insurance / Broking"
+    if any(k in t for k in ["public relations", "pr account", "pr agency", "media relations", "corporate communications"]):
+        return "PR / Communications"
+    if any(k in t for k in ["wealth management", "private wealth", "financial planning", "paraplanner", "ifa administrator"]):
+        return "Wealth / Financial Planning"
     if any(k in t for k in ["fintech", "financial services", "financial markets", "banking", "payments", "investment"]):
         return "Financial Services / FinTech"
     if any(k in t for k in ["recruitment", "executive search", "staffing"]):
@@ -279,6 +347,12 @@ def eligibility(title, desc):
 def fit_reasons(title, desc):
     h = blob(title, desc)
     reasons = []
+    if any(x in h for x in ["insurance", "underwriting", "broking", "claims handler"]):
+        reasons.append("Insurance / broking career path")
+    if any(x in h for x in ["public relations", "pr account", "media relations", "communications agency"]):
+        reasons.append("PR agency / communications exposure")
+    if any(x in h for x in ["wealth management", "financial planning", "private wealth", "paraplanner"]):
+        reasons.append("Wealth management / financial planning exposure")
     if any(x in h for x in ["strategy", "consulting", "consultant", "business transformation"]):
         reasons.append("Consulting / strategy aligned")
     if any(x in h for x in ["advisory", "deals", "transaction advisory", "corporate finance", "restructuring"]):
@@ -393,6 +467,7 @@ def make_job(x):
     s = score_job(title, desc)
     e = eligibility(title, desc)
     company_l = company.lower()
+    boutique = company_l in BOUTIQUE_EMPLOYERS
     employer_bonus = max([v for k, v in PRIORITY_EMPLOYERS.items() if k in company_l] or [0])
     s = min(99, s + employer_bonus)
     created = x.get("created") or ""
@@ -408,6 +483,8 @@ def make_job(x):
     return {
         "id": "adz-" + ident,
         "company": company,
+        "boutique": boutique,
+        "employerType": "Independent / specialist" if boutique else "Not verified",
         "initials": "".join(w[0] for w in company.split()[:2]).upper(),
         "title": title,
         "category": category_for(title, desc),
