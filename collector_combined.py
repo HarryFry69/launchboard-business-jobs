@@ -44,7 +44,7 @@ def key(j):
 def current_listing(j, today=None):
     today = today or date.today()
     cutoff = j.get("deadline") or j.get("expiresAt")
-    if cutoff and re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", str(cutoff)):
+    if cutoff and len(str(cutoff)) == 10 and str(cutoff)[4] == "-":
         try:
             return date.fromisoformat(cutoff) >= today
         except ValueError:
