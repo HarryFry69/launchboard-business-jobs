@@ -20,8 +20,8 @@ class LaunchboardTests(unittest.TestCase):
     def test_adzuna_quota_and_rotation(self):
         self.assertEqual(len(adz.QUERIES), 12)
         self.assertEqual(len(set(adz.QUERIES)), 12)
-        self.assertTrue(any("insurance" in q or "broker" in q or "underwrit" in q for q in adz.QUERIES))
-        self.assertTrue(any("pr" in q.lower().split() or "communications" in q or "public relations" in q for q in adz.QUERIES))
+        self.assertTrue(any("insurance" in q or "broker" in q or "underwrit" in q or "claims" in q for q in adz.QUERIES))
+        self.assertTrue(any("pr" in q.lower().split() or "communications" in q or "public relations" in q or "media relations" in q for q in adz.QUERIES))
         self.assertTrue(any("wealth" in q or "financial planning" in q or "paraplan" in q or "investment" in q for q in adz.QUERIES))
 
     def test_categories_preserve_core_and_add_specialisms(self):
