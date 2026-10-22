@@ -14,6 +14,7 @@ GREENHOUSE = [
 
 LEVER = [
     ("Zopa", "zopa"),
+    ("Titan Wealth", "titanwh"),
     ("Bisnow", "bisnow"),
     ("Samba TV", "sambatv"),
 ]
