@@ -6,6 +6,9 @@ on:
     paths:
       - "collector_*.py"
       - "priority_jobs.json"
+      - "featured_jobs.json"
+      - "employers.json"
+      - "test_launchboard.py"
   schedule:
     - cron: "17 */4 * * *"
 
@@ -26,6 +29,9 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+
+      - name: Validate job matching and source data
+        run: python -m unittest -v test_launchboard.py
 
       - name: Refresh jobs feed
         env:
