@@ -50,9 +50,16 @@ class LaunchboardTests(unittest.TestCase):
 
     def test_research_directory(self):
         rows = json.loads((ROOT / "employers.json").read_text(encoding="utf-8"))
-        self.assertGreaterEqual(len(rows), 15)
+        self.assertGreaterEqual(len(rows), 250)
         self.assertEqual(len(rows), len({r["name"].lower() for r in rows}))
         self.assertGreaterEqual(len({r["category"] for r in rows}), 3)
+        self.assertGreaterEqual(sum(bool(r["independent"]) for r in rows), 180)
+        for sector in ("Insurance & Broking", "PR & Communications", "Wealth Management & Financial Planning"):
+            self.assertGreaterEqual(sum(r["category"] == sector for r in rows), 50)
+        for r in rows:
+            if r.get("linkType") == "research-source":
+                self.assertTrue(r.get("sourceName"), r["name"])
+                self.assertTrue(r.get("sourceUrl", "").startswith("https://"), r["name"])
         for r in rows:
             self.assertEqual(urlparse(r["url"]).scheme, "https")
             self.assertTrue(urlparse(r["url"]).netloc)
