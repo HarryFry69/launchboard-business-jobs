@@ -1,0 +1,192 @@
+[
+  {
+    "name": "Bissell & Partners",
+    "category": "Insurance & Broking",
+    "location": "London",
+    "url": "https://bissellandpartners.co.uk/careers/",
+    "type": "Boutique / independent",
+    "note": "Specialist Lloyd's-market wholesale broker",
+    "checkedAt": "2026-10-22",
+    "independent": true
+  },
+  {
+    "name": "C&C Insurance Brokers",
+    "category": "Insurance & Broking",
+    "location": "Multiple UK offices",
+    "url": "https://cc-insure.com/careers/",
+    "type": "Independent / specialist",
+    "note": "Regional commercial broking; accepts expressions of interest",
+    "checkedAt": "2026-10-22",
+    "independent": true
+  },
+  {
+    "name": "Coversure Careers",
+    "category": "Insurance & Broking",
+    "location": "UK-wide local offices",
+    "url": "https://www.coversurecareers.co.uk/",
+    "type": "Independent-office network",
+    "note": "Local brokerage jobs in an independently operated franchise network",
+    "checkedAt": "2026-10-22",
+    "independent": true
+  },
+  {
+    "name": "Brown & Brown UK",
+    "category": "Insurance & Broking",
+    "location": "UK-wide",
+    "url": "https://bbrown.com/uk/about/careers/graduate-programmes/",
+    "type": "Large / regional network",
+    "note": "Structured insurance graduate programme and regional offices",
+    "checkedAt": "2026-10-22",
+    "independent": false
+  },
+  {
+    "name": "NFU Mutual Agency Careers",
+    "category": "Insurance & Broking",
+    "location": "UK-wide",
+    "url": "https://agencycareers.nfumutual.co.uk/",
+    "type": "Local agency network",
+    "note": "Individual agency employers with entry-level commercial opportunities",
+    "checkedAt": "2026-10-22",
+    "independent": false
+  },
+  {
+    "name": "Brazen PR",
+    "category": "PR & Communications",
+    "location": "Manchester",
+    "url": "https://wearebrazenpr.com/join-us/junior-pr-account-executive/",
+    "type": "Independent / specialist",
+    "note": "PR and social media graduate-trainee pathways",
+    "checkedAt": "2026-10-22",
+    "independent": true
+  },
+  {
+    "name": "TRACE Publicity",
+    "category": "PR & Communications",
+    "location": "London",
+    "url": "https://www.wearetrace.co/careers/",
+    "type": "Independent / specialist",
+    "note": "Fashion, beauty and lifestyle PR; junior account roles",
+    "checkedAt": "2026-10-22",
+    "independent": true
+  },
+  {
+    "name": "Liberty PR",
+    "category": "PR & Communications",
+    "location": "Market Harborough",
+    "url": "https://www.libertypr.co.uk/careers/",
+    "type": "Independent / specialist",
+    "note": "Independent PR agency; check vacancy status and speculative route",
+    "checkedAt": "2026-10-22",
+    "independent": true
+  },
+  {
+    "name": "The Jargon Group",
+    "category": "PR & Communications",
+    "location": "Hampshire / Manchester",
+    "url": "https://www.thejargongroup.com/careers",
+    "type": "Independent / specialist",
+    "note": "Specialist B2B technology communications",
+    "checkedAt": "2026-10-22",
+    "independent": true
+  },
+  {
+    "name": "Not Born Yesterday PR",
+    "category": "PR & Communications",
+    "location": "London",
+    "url": "https://www.notbornyesterday.co.uk/accountexecutivejob",
+    "type": "Boutique / independent",
+    "note": "Founder-led corporate PR; advertised role asks for prior PR experience",
+    "checkedAt": "2026-10-22",
+    "independent": true
+  },
+  {
+    "name": "Teamspirit",
+    "category": "PR & Communications",
+    "location": "London",
+    "url": "https://www.teamspirit.co.uk/careers",
+    "type": "Specialist agency",
+    "note": "Financial-services PR, marketing and communications",
+    "checkedAt": "2026-10-22",
+    "independent": false
+  },
+  {
+    "name": "Clarity",
+    "category": "PR & Communications",
+    "location": "London / international",
+    "url": "https://www.clarity.global/careers",
+    "type": "Specialist agency",
+    "note": "Technology PR, communications and marketing",
+    "checkedAt": "2026-10-22",
+    "independent": false
+  },
+  {
+    "name": "MFP Wealth Management",
+    "category": "Wealth Management & Financial Planning",
+    "location": "Christchurch, Dorset",
+    "url": "https://www.mfpwealthmanagement.co.uk/work-for-us",
+    "type": "Boutique / independent",
+    "note": "Graduate financial planner training at a small independent practice",
+    "checkedAt": "2026-10-22",
+    "independent": true
+  },
+  {
+    "name": "Killik & Co",
+    "category": "Wealth Management & Financial Planning",
+    "location": "London / Ipswich",
+    "url": "https://killik.com/about-us/careers/",
+    "type": "Independent / specialist",
+    "note": "Independently owned wealth manager with trainee schemes",
+    "checkedAt": "2026-10-22",
+    "independent": true
+  },
+  {
+    "name": "Perspective Financial Group",
+    "category": "Wealth Management & Financial Planning",
+    "location": "UK-wide",
+    "url": "https://www.pfgl.co.uk/careers/vacancies-jobs/",
+    "type": "Specialist group",
+    "note": "Regional financial planning administrator roles",
+    "checkedAt": "2026-10-22",
+    "independent": false
+  },
+  {
+    "name": "Partners Wealth Management",
+    "category": "Wealth Management & Financial Planning",
+    "location": "London / Edinburgh / Solihull",
+    "url": "https://careers.partnerswealthmanagement.co.uk/vacancies/vacancy-search-results.aspx",
+    "type": "Specialist group",
+    "note": "Wealth client services and paraplanning",
+    "checkedAt": "2026-10-22",
+    "independent": false
+  },
+  {
+    "name": "Titan Wealth",
+    "category": "Wealth Management & Financial Planning",
+    "location": "UK-wide",
+    "url": "https://jobs.lever.co/titanwh",
+    "type": "Specialist group",
+    "note": "Junior support, client service and paraplanning",
+    "checkedAt": "2026-10-22",
+    "independent": false
+  },
+  {
+    "name": "Succession Wealth",
+    "category": "Wealth Management & Financial Planning",
+    "location": "UK-wide",
+    "url": "https://careers.successionwealth.co.uk/vacancies",
+    "type": "Specialist group",
+    "note": "Independent advice, employee-benefits and client operations",
+    "checkedAt": "2026-10-22",
+    "independent": false
+  },
+  {
+    "name": "Quilter Cheviot",
+    "category": "Wealth Management & Financial Planning",
+    "location": "UK-wide",
+    "url": "https://careers.quilter.com/early-careers/one-year-programme/",
+    "type": "Large / established",
+    "note": "Investment management and wealth management early careers",
+    "checkedAt": "2026-10-22",
+    "independent": false
+  }
+]
