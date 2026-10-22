@@ -1,20 +1,5 @@
 [
   {
-    "name": "Acuity Professional",
-    "location": "UK",
-    "category": "Insurance & Broking",
-    "type": "Specialist broker / size to verify",
-    "independent": false,
-    "url": "https://www.insuranceage.co.uk/uk-broker-awards/shortlist",
-    "linkType": "research-source",
-    "sourceUrl": "https://www.insuranceage.co.uk/uk-broker-awards/shortlist",
-    "sourceName": "UK Broker Awards 2026 shortlist",
-    "checkedAt": "2026-10-22",
-    "note": "Recognised on UK broking industry shortlist. Research current ownership, firm size and graduate/trainee openings before approaching.",
-    "researchStatus": "Directory listed — careers not checked",
-    "sourceGroup": "brokerAwards"
-  },
-  {
     "name": "Aguila",
     "location": "UK",
     "category": "Insurance & Broking",
@@ -245,21 +230,6 @@
     "note": "Independent or smaller insurance broker sourced from 2026 sector research. Look for trainee broker, account handling and operations roles.",
     "researchStatus": "Directory listed — careers not checked",
     "sourceGroup": "insurance2026"
-  },
-  {
-    "name": "Daines Kapp Insurance Brokers",
-    "location": "Hertfordshire",
-    "category": "Insurance & Broking",
-    "type": "Specialist broker / size to verify",
-    "independent": false,
-    "url": "https://www.insuranceage.co.uk/uk-broker-awards/shortlist",
-    "linkType": "research-source",
-    "sourceUrl": "https://www.insuranceage.co.uk/uk-broker-awards/shortlist",
-    "sourceName": "UK Broker Awards 2026 shortlist",
-    "checkedAt": "2026-10-22",
-    "note": "Recognised on UK broking industry shortlist. Research current ownership, firm size and graduate/trainee openings before approaching.",
-    "researchStatus": "Directory listed — careers not checked",
-    "sourceGroup": "brokerAwards"
   },
   {
     "name": "DOA Underwriting",
@@ -950,32 +920,18 @@
     "sourceGroup": "prNorth"
   },
   {
-    "name": "Brazen",
-    "location": "Manchester",
-    "category": "PR & Communications",
-    "type": "Small / private PR agency (2025)",
-    "independent": true,
-    "url": "https://www.prolificnorth.co.uk/news/revealed-prolific-norths-top-50-pr-agencies-2025/",
-    "linkType": "research-source",
-    "sourceUrl": "https://www.prolificnorth.co.uk/news/revealed-prolific-norths-top-50-pr-agencies-2025/",
-    "sourceName": "Prolific North PR Top 50 (2025)",
-    "checkedAt": "2026-10-22",
-    "note": "Privately owned northern PR agency listed in 2025 rankings. Research junior account-executive, client-service and communications opportunities.",
-    "researchStatus": "Directory listed — careers not checked",
-    "sourceGroup": "prNorth"
-  },
-  {
     "name": "Brazen PR",
     "category": "PR & Communications",
     "location": "Manchester",
     "url": "https://wearebrazenpr.com/join-us/junior-pr-account-executive/",
     "type": "Independent / specialist",
-    "note": "PR and social media graduate-trainee pathways",
+    "note": "Independent Manchester PR agency; check careers hub for zero-to-one-year roles. Closed posts are not live vacancies.",
     "checkedAt": "2026-10-22",
     "independent": true,
     "linkType": "careers",
-    "sourceUrl": "https://wearebrazenpr.com/join-us/junior-pr-account-executive/",
-    "researchStatus": "Direct careers page supplied"
+    "sourceUrl": "https://www.prolificnorth.co.uk/news/revealed-prolific-norths-top-50-pr-agencies-2025/",
+    "researchStatus": "Direct careers page supplied",
+    "sourceName": "Official careers / Prolific North ranking"
   },
   {
     "name": "Carousel PR",
