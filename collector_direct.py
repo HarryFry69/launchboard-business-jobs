@@ -81,7 +81,11 @@ def early_relevant(title, desc=""):
         "graduate", "entry level", "entry-level", "junior", "trainee",
         "analyst", "consultant", "business development", "sales development",
         "account executive", "operations", "commercial", "recruitment",
-        "project", "advisory", "risk", "audit", "tax", "capital markets"
+        "project", "advisory", "risk", "audit", "tax", "capital markets",
+        "insurance", "underwrit", "broker", "claims", "public relations",
+        "pr account", "communications", "media relations", "wealth",
+        "paraplann", "financial planning", "investment assistant",
+        "client services", "account handler", "financial administrator"
     ])
     if not title_job_signal:
         return False
@@ -106,7 +110,13 @@ def early_relevant(title, desc=""):
         "business development representative", "business development executive",
         "sales development representative", "revenue operations analyst",
         "business analyst", "commercial analyst", "associate consultant",
-        "client service associate", "account executive", "project coordinator"
+        "client service associate", "account executive", "project coordinator",
+        "insurance account handler", "insurance broker", "trainee broker",
+        "underwriting assistant", "claims handler", "claims assistant",
+        "pr account executive", "communications executive", "pr assistant",
+        "junior public relations", "wealth administrator", "wealth management associate",
+        "financial planning administrator", "trainee paraplanner",
+        "client services administrator", "investment assistant"
     ]
     return any(x in t for x in junior_titles) and yrs == 0
 
