@@ -269,9 +269,11 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
 $('exportTracker').onclick=exportTracker;
 async function boot(){
  if(location.protocol!=='file:'){
+  jobs=[]; // Never substitute an old embedded snapshot for failed live requests.
   try{
    const r=await fetch('jobs.json?ts='+Date.now(),{cache:'no-store'});
    if(r.ok){const live=await r.json();if(Array.isArray(live)&&live.length)jobs=live}
+   if(!jobs.length)$('updatedText').textContent='Live feed temporarily unavailable — check again later.'
   }catch(e){}
  }
  try{if(location.protocol!=='file:'){const r=await fetch('employers.json?ts='+Date.now(),{cache:'no-store'});if(r.ok)employers=await r.json()}}catch(e){}
