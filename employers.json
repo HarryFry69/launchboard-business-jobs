@@ -531,13 +531,13 @@
     "category": "Insurance & Broking",
     "type": "Boutique / small insurance broker",
     "independent": true,
-    "url": "https://report.uk.foliume.com/",
-    "linkType": "research-source",
-    "sourceUrl": "https://report.uk.foliume.com/",
-    "sourceName": "Foliume UK Broker Index (2026)",
+    "url": "https://www.kerrylondon.co.uk/careers/",
+    "linkType": "careers",
+    "sourceUrl": "https://www.kerrylondon.co.uk/careers/",
+    "sourceName": "Official employer careers",
     "checkedAt": "2026-10-22",
-    "note": "Independent or smaller insurance broker sourced from 2026 sector research. Look for trainee broker, account handling and operations roles.",
-    "researchStatus": "Directory listed — careers not checked",
+    "note": "Independent insurance broker advertising careers in broking, claims and commercial services. Welcomes new starters.",
+    "researchStatus": "Official career page checked 22 Oct 2026; vacancies may change",
     "sourceGroup": "insurance2026"
   },
   {
@@ -1407,6 +1407,20 @@
     "sourceGroup": "prNorth"
   },
   {
+    "name": "Grammatik",
+    "category": "PR & Communications",
+    "location": "London",
+    "type": "Boutique B2B technology PR agency",
+    "independent": true,
+    "checkedAt": "2026-10-22",
+    "url": "https://www.grammatikagency.com/careers/",
+    "linkType": "careers",
+    "sourceUrl": "https://www.grammatikagency.com/careers/",
+    "sourceName": "Official employer careers",
+    "researchStatus": "Official career page checked 22 Oct 2026; vacancies may change",
+    "note": "Careers page advertises PR and Marketing Assistant in East London; check if suitable for 2027 graduates."
+  },
+  {
     "name": "Growthack",
     "location": "Nottingham",
     "category": "PR & Communications",
@@ -1441,13 +1455,13 @@
     "location": "UK",
     "type": "Boutique PR award nominee (2025)",
     "independent": true,
-    "url": "https://www.prmomentawards.com/the-prmoment-awards-shortlist-2025",
-    "linkType": "research-source",
-    "sourceUrl": "https://www.prmomentawards.com/the-prmoment-awards-shortlist-2025",
-    "sourceName": "PRmoment Boutique Agency shortlist",
+    "url": "https://www.hardnumbers.co.uk/jobs",
+    "linkType": "careers",
+    "sourceUrl": "https://www.hardnumbers.co.uk/jobs",
+    "sourceName": "Official employer careers",
     "checkedAt": "2026-10-22",
-    "note": "Agency or broker listed in the cited trade shortlist; verify careers and vacancy eligibility before applying.",
-    "researchStatus": "Research target; no confirmed opening"
+    "note": "Official agency jobs page lists Communications Associate (£26,250–£29,400) and Junior Communications Consultant (£33,600–£37,800); confirm suitability and start date.",
+    "researchStatus": "Official career page checked 22 Oct 2026; vacancies may change"
   },
   {
     "name": "Harris Creative",
@@ -2826,6 +2840,20 @@
     "sourceGroup": "wealth2026"
   },
   {
+    "name": "EQ Investors",
+    "category": "Wealth Management & Financial Planning",
+    "location": "London",
+    "type": "Independent staff-owned boutique wealth manager",
+    "independent": true,
+    "checkedAt": "2026-10-22",
+    "url": "https://eqinvestors.co.uk/careers",
+    "linkType": "careers",
+    "sourceUrl": "https://eqinvestors.co.uk/careers",
+    "sourceName": "Official employer careers",
+    "researchStatus": "Official career page checked 22 Oct 2026; vacancies may change",
+    "note": "Independent wealth manager with a published careers page and interest in growing its team."
+  },
+  {
     "name": "Estate Capital Financial Management Ltd",
     "location": "UK",
     "category": "Wealth Management & Financial Planning",
@@ -3086,13 +3114,13 @@
     "category": "Wealth Management & Financial Planning",
     "type": "2026 boutique adviser (≤10 FCA-registered people)",
     "independent": true,
-    "url": "https://www.ftadviser.com/content/e2c10380-f21d-423c-bae3-94fe7a118230",
-    "linkType": "research-source",
-    "sourceUrl": "https://www.ftadviser.com/content/e2c10380-f21d-423c-bae3-94fe7a118230",
-    "sourceName": "FT Adviser Boutique 50 (2026)",
+    "url": "https://www.investmentquorum.com/careers",
+    "linkType": "careers",
+    "sourceUrl": "https://www.investmentquorum.com/careers",
+    "sourceName": "Official employer careers",
     "checkedAt": "2026-10-22",
-    "note": "FT Adviser 2026 Top 50 Boutique Financial Adviser. Research trainee financial-planning, investment-administration and client-support roles.",
-    "researchStatus": "Directory listed — careers not checked",
+    "note": "Official careers page currently reports no open roles. Independent London boutique wealth manager.",
+    "researchStatus": "Official career page checked 22 Oct 2026; vacancies may change",
     "sourceGroup": "wealth2026"
   },
   {
