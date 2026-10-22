@@ -27,7 +27,7 @@ a{color:inherit}
 .tab{border:0;border-radius:18px;background:#e8eef7;color:#17315f;padding:8px 15px;font-size:12px;font-weight:800;cursor:pointer}
 .tab.active{background:var(--teal);color:#fff}
 .controls{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:10px}
-.control-grid{display:grid;grid-template-columns:2fr repeat(5,1fr);gap:8px;align-items:end}
+.control-grid{display:grid;grid-template-columns:2fr repeat(6,1fr);gap:8px;align-items:end}
 .control label{display:block;font-size:11px;font-weight:800;color:#344054;margin:0 0 4px}
 .control input,.control select{width:100%;height:36px;border:1px solid #cfd5dc;background:#fff;border-radius:4px;padding:0 9px;font-size:12px}
 .checkline{display:flex;align-items:center;gap:8px;height:36px;font-size:12px;font-weight:700;color:#344054}
@@ -53,6 +53,11 @@ tbody tr:hover{background:#eef7ff}
 .badge{display:inline-block;border-radius:999px;padding:3px 6px;background:#eef2f6;font-size:10px;font-weight:700;white-space:nowrap}
 .footer{font-size:11px;color:#98a2b3;padding:16px 2px 30px}
 .empty{padding:30px;text-align:center;color:#667085}
+[hidden]{display:none!important}
+.directory-tools{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}
+.directory-tools input,.directory-tools select{padding:9px;border:1px solid #cfd5dc;border-radius:5px;min-width:190px}
+.export-button{border:1px solid #cfd5dc;background:#fff;padding:7px 11px;border-radius:5px;cursor:pointer;font-weight:bold}
+.employer-table{min-width:750px}
 @media(max-width:900px){
  .control-grid{grid-template-columns:1fr 1fr}.hero h1{font-size:25px}.wrap{padding:10px}
 }
@@ -78,15 +83,17 @@ tbody tr:hover{background:#eef7ff}
     <button class="tab" data-tab="top">Top Matches</button>
     <button class="tab" data-tab="saved">Saved</button>
     <button class="tab" data-tab="applied">Applied</button>
+    <button class="tab" data-tab="employers">Target Employers</button>
   </div>
 
+  <div id="jobsPanel">
   <div class="controls">
     <div class="control-grid">
       <div class="control"><label>Search</label><input id="search" placeholder="Search company, role, sector..."></div>
       <div class="control"><label>Category</label><select id="category"><option value="">All</option></select></div>
       <div class="control"><label>Employer type</label><select id="employerType"><option value="">All employers</option><option value="boutique">Independent / specialist firms</option></select></div>
       <div class="control"><label>Location</label><select id="location"><option value="">Anywhere UK</option></select></div>
-      <div class="control"><label>Minimum CV Match</label><select id="minscore"><option value="0">Any</option><option value="60">60%+</option><option value="70" selected>70%+</option><option value="80">80%+</option><option value="90">90%+</option></select></div>
+      <div class="control"><label>Minimum CV Match</label><select id="minscore"><option value="0" selected>Any</option><option value="60">60%+</option><option value="70">70%+</option><option value="80">80%+</option><option value="90">90%+</option></select></div>
       <div class="control"><label>Sort</label><select id="sort"><option value="score">Best CV match</option><option value="newest">Newest first</option><option value="salary">Highest salary</option></select></div>
       <label class="checkline"><input id="directOnly" type="checkbox"> Direct employer links only</label>
     </div>
@@ -96,6 +103,7 @@ tbody tr:hover{background:#eef7ff}
     <span><strong id="shown">0</strong> roles shown</span>
     <span><strong id="savedCount">0</strong> saved</span>
     <span><strong id="appliedCount">0</strong> applied</span>
+    <button id="exportTracker" class="export-button">Export applications CSV ↓</button>
     <span class="right">Click the <strong>role name</strong> or <strong>Apply</strong> to open the original application.</span>
   </div>
 
@@ -120,7 +128,13 @@ tbody tr:hover{background:#eef7ff}
       <tbody id="tbody"></tbody>
     </table>
   </div>
-  <div class="footer">Personal job tracker. CV Match is a prioritisation score, not a guarantee of eligibility. Application links open the original listing; DIRECT marks employer/ATS sources. Saved/application status is stored in this browser. Aggregated listings: Jobs by <a href="https://www.adzuna.co.uk/" target="_blank" rel="noopener">Adzuna</a>.</div>
+  </div>
+  <section id="employersPanel" hidden>
+   <p><strong>Target employers:</strong> Research boutique brokers, specialist PR agencies and wealth firms. These careers pages are not guarantees of current vacancies; check before applying.</p>
+   <div class="directory-tools"><input id="employerSearch" placeholder="Search employer or town..."><select id="employerSector"><option value="">All sectors</option><option>Insurance &amp; Broking</option><option>PR &amp; Communications</option><option>Wealth Management &amp; Financial Planning</option></select><select id="employerKind"><option value="">All firms</option><option value="independent">Independent / boutique only</option></select><strong id="employerCount"></strong></div>
+   <div class="table-shell"><table class="employer-table"><thead><tr><th>Employer</th><th>Sector</th><th>Location</th><th>Type</th><th>Why consider</th><th>Careers</th></tr></thead><tbody id="employerRows"></tbody></table></div>
+  </section>
+  <div class="footer">Personal job tracker. CV Match and eligibility are estimates, not guarantees. Checked roles expire automatically; confirm every vacancy and start date on the employer website. Application links open the original listing; DIRECT marks employer/ATS sources. Saved/application status is stored in this browser. Aggregated listings: Jobs by <a href="https://www.adzuna.co.uk/" target="_blank" rel="noopener">Adzuna</a>.</div>
 </div>
 
 <script>
@@ -129,6 +143,7 @@ const store={
  get(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return[]}},
  set(k,v){localStorage.setItem(k,JSON.stringify(v))}
 };
+let employers=[];
 let state={tab:'all',saved:store.get('lb_saved'),applied:store.get('lb_applied'),statuses:store.get('lb_statuses')||{}};
 const $=id=>document.getElementById(id);
 function statusFor(id){
@@ -148,7 +163,7 @@ function setStatus(id,val){
 }
 function openingDate(j){return j.posted||'Recent'}
 function closingDate(j){return j.deadline||''}
-function isOpen(j){return true}
+function isOpen(j){const end=j.deadline||j.expiresAt;return !end||String(end)>=new Date().toISOString().slice(0,10)}
 function matchClass(s){return s>=95?'m95':s>=85?'m85':'m70'}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function categories(){
@@ -164,7 +179,8 @@ function initOptions(){
 function filterJobs(){
  let arr=[...jobs],q=$('search').value.trim().toLowerCase(),cat=$('category').value,loc=$('location').value,min=+$('minscore').value;
   if($('employerType').value==='boutique')arr=arr.filter(j=>j.boutique===true);
- if(state.tab==='top') arr=arr.filter(j=>j.score>=90);
+ arr=arr.filter(isOpen);
+  if(state.tab==='top') arr=arr.filter(j=>j.score>=90);
  if(state.tab==='saved') arr=arr.filter(j=>state.saved.includes(j.id));
  if(state.tab==='applied') arr=arr.filter(j=>state.applied.includes(j.id));
  if(q)arr=arr.filter(j=>[j.company,j.title,j.category,j.location,j.sector,...(j.tags||[])].join(' ').toLowerCase().includes(q));
@@ -212,10 +228,34 @@ function render(){
  tb.innerHTML=out;
  document.querySelectorAll('[data-status]').forEach(s=>s.onchange=()=>setStatus(s.dataset.status,s.value));
 }
+
+function renderEmployers(){
+ const q=$('employerSearch').value.toLowerCase(),cat=$('employerSector').value;
+ const only=$('employerKind').value;
+ let list=employers.filter(e=>(!cat||e.category===cat)&&(!only||e.independent));
+ if(q)list=list.filter(e=>[e.name,e.location,e.type,e.note].join(' ').toLowerCase().includes(q));
+ $('employerCount').textContent=list.length+' companies';
+ $('employerRows').innerHTML=list.map(e=>'<tr><td class="company">'+esc(e.name)+'</td><td>'+esc(e.category)+'</td><td>'+esc(e.location)+'</td><td>'+esc(e.type)+'</td><td>'+esc(e.note)+'</td><td class="apply"><a href="'+esc(e.url)+'" target="_blank" rel="noopener">Careers ↗</a></td></tr>').join('')||'<tr><td colspan="6" class="empty">No companies found.</td></tr>';
+}
+function switchTab(){
+ const dir=state.tab==='employers';$('jobsPanel').hidden=dir;$('employersPanel').hidden=!dir;
+ if(dir)renderEmployers();else render();
+}
+function exportTracker(){
+ const h=['Company','Title','Category','Location','Status','Match estimate','Eligibility estimate','Salary','Deadline','Application link'];
+ const rows=jobs.map(j=>[j.company,j.title,j.category,j.location,statusFor(j.id),j.score,j.eligibility,j.salary,j.deadline||'',j.url]);
+ const escCSV=x=>'"'+String(x??'').replace(/"/g,'""')+'"';
+ const txt=[h,...rows].map(r=>r.map(escCSV).join(',')).join('\r\n');
+ const url=URL.createObjectURL(new Blob(['\ufeff'+txt],{type:'text/csv;charset=utf-8'}));
+ const a=document.createElement('a');a.href=url;a.download='launchboard-applications.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);
+}
+
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
- state.tab=b.dataset.tab;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));render()
+ state.tab=b.dataset.tab;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));switchTab()
 });
 ['search','category','employerType','location','minscore','sort','directOnly'].forEach(id=>$(id).addEventListener('input',render));
+['employerSearch','employerSector','employerKind'].forEach(id=>$(id).addEventListener('input',renderEmployers));
+$('exportTracker').onclick=exportTracker;
 async function boot(){
  if(location.protocol!=='file:'){
   try{
@@ -223,7 +263,8 @@ async function boot(){
    if(r.ok){const live=await r.json();if(Array.isArray(live)&&live.length)jobs=live}
   }catch(e){}
  }
- initOptions();render();
+ try{if(location.protocol!=='file:'){const r=await fetch('employers.json?ts='+Date.now(),{cache:'no-store'});if(r.ok)employers=await r.json()}}catch(e){}
+ initOptions();switchTab();
 }
 boot();
 </script>
