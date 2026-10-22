@@ -273,6 +273,22 @@ def category(text):
 
 def category_for(title, desc):
     t = title.lower()
+    d = desc.lower()
+    # Generic titles at smaller firms need industry-specific description checks.
+    generic = any(k in t for k in [
+        "account executive", "account handler", "client service",
+        "administrator", "administrative assistant", "office assistant"
+    ]) and not any(k in t for k in [
+        "consult", "strategy", "business development", "recruitment",
+        "underwriting", "insurance", "financial", "wealth", "risk", "tax"
+    ])
+    if generic:
+        if any(k in d for k in ["public relations", "pr agency", "pr consultancy", "media relations"]):
+            return "PR & Communications"
+        if any(k in d for k in ["insurance broker", "insurance brokerage", "underwriting", "insurance policies"]):
+            return "Insurance & Broking"
+        if any(k in d for k in ["wealth management", "financial planning", "paraplanning", "investment portfolio"]):
+            return "Wealth Management & Financial Planning"
     # Prefer the title so a sales role mentioning "consulting services" doesn't
     # get mislabelled as consulting.
     title_rules = [
