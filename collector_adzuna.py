@@ -54,13 +54,18 @@ QUERIES = search_queries()
 
 # Known independent/specialist practices and agencies. This is a curated
 # discovery label, NOT an estimate of employee headcount.
-BOUTIQUE_EMPLOYERS = {
-    "th march", "broker experts", "john morgan partnership",
-    "acres insurance brokers", "citynet insurance brokers",
-    "brazen pr", "fire on the hill", "eleven hundred agency",
-    "red lorry yellow lorry", "liberty pr", "mattison public relations",
-    "greenhouse communications", "glasgow wealth",
-}
+# The same researched employer directory powers the front-end and classification.
+# An unknown employer is not automatically assumed to be a large firm.
+def employer_profile(company):
+    path = Path(__file__).with_name("employers.json")
+    try:
+        for row in json.loads(path.read_text(encoding="utf-8")):
+            if re.sub(r"[^a-z0-9]", "", row["name"].lower()) == re.sub(r"[^a-z0-9]", "", company.lower()):
+                return row.get("type", "Not verified"), bool(row.get("independent", False))
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    return "Not verified", False
+
 
 EARLY = [
     "graduate", "entry level", "entry-level", "junior", "trainee",
@@ -467,7 +472,7 @@ def make_job(x):
     s = score_job(title, desc)
     e = eligibility(title, desc)
     company_l = company.lower()
-    boutique = company_l in BOUTIQUE_EMPLOYERS
+    employer_type, boutique = employer_profile(company)
     employer_bonus = max([v for k, v in PRIORITY_EMPLOYERS.items() if k in company_l] or [0])
     s = min(99, s + employer_bonus)
     created = x.get("created") or ""
@@ -484,7 +489,7 @@ def make_job(x):
         "id": "adz-" + ident,
         "company": company,
         "boutique": boutique,
-        "employerType": "Independent / specialist" if boutique else "Not verified",
+        "employerType": employer_type,
         "initials": "".join(w[0] for w in company.split()[:2]).upper(),
         "title": title,
         "category": category_for(title, desc),
