@@ -29,6 +29,9 @@ class LaunchboardTests(unittest.TestCase):
             ("Trainee Insurance Broker", "Insurance broking", "Insurance & Broking"),
             ("PR Account Executive", "Public relations agency", "PR & Communications"),
             ("Graduate Wealth Management Analyst", "Financial planning", "Wealth Management & Financial Planning"),
+            ("Account Executive", "PR agency writing press releases and pitching journalists", "PR & Communications"),
+            ("Account Handler", "Independent insurance broker servicing policies", "Insurance & Broking"),
+            ("Client Services Administrator", "Wealth management and financial planning", "Wealth Management & Financial Planning"),
             ("Graduate Strategy Consultant", "Management consulting", "Strategy & Consulting"),
         ]
         for title, desc, expected in tests:
