@@ -114,7 +114,7 @@ tbody tr:hover{background:#eef7ff}
         <th>Company Name</th>
         <th>Programme / Role</th>
         <th>Category</th>
-        <th>Opening Date</th>
+        <th>Posted / Checked</th>
         <th>Closing Date</th>
         <th>Location</th>
         <th>Salary / OTE</th>
@@ -144,6 +144,7 @@ const store={
  set(k,v){localStorage.setItem(k,JSON.stringify(v))}
 };
 let employers=[];
+let trackedArchive=store.get('lb_tracked_archive');if(!trackedArchive||Array.isArray(trackedArchive))trackedArchive={};
 let state={tab:'all',saved:store.get('lb_saved'),applied:store.get('lb_applied'),statuses:store.get('lb_statuses')||{}};
 const $=id=>document.getElementById(id);
 function statusFor(id){
@@ -158,10 +159,14 @@ function setStatus(id,val){
  if(val!=='Saved') state.saved=state.saved.filter(x=>x!==id);
  if(['Applied','Assessment','Interview','Offer','Rejected'].includes(val) && !state.applied.includes(id)) state.applied.push(id);
  if(!['Applied','Assessment','Interview','Offer','Rejected'].includes(val)) state.applied=state.applied.filter(x=>x!==id);
+ const current=jobs.find(j=>j.id===id);
+ if(current&&val!=='Not Applied')trackedArchive[id]={...current,archived:true,new:false};
+ if(val==='Not Applied')delete trackedArchive[id];
+ store.set('lb_tracked_archive',trackedArchive);
  store.set('lb_statuses',state.statuses);store.set('lb_saved',state.saved);store.set('lb_applied',state.applied);
  render();
 }
-function openingDate(j){return j.posted||'Recent'}
+function openingDate(j){return j.verifiedAt?'Checked '+j.verifiedAt:(j.posted||'Not stated')}
 function closingDate(j){return j.deadline||''}
 function isOpen(j){const end=j.deadline||j.expiresAt;return !end||String(end)>=new Date().toISOString().slice(0,10)}
 function matchClass(s){return s>=95?'m95':s>=85?'m85':'m70'}
@@ -179,7 +184,7 @@ function initOptions(){
 function filterJobs(){
  let arr=[...jobs],q=$('search').value.trim().toLowerCase(),cat=$('category').value,loc=$('location').value,min=+$('minscore').value;
   if($('employerType').value==='boutique')arr=arr.filter(j=>j.boutique===true);
- arr=arr.filter(isOpen);
+ if(!['saved','applied'].includes(state.tab))arr=arr.filter(j=>isOpen(j)&&!j.archived);
   if(state.tab==='top') arr=arr.filter(j=>j.score>=90);
  if(state.tab==='saved') arr=arr.filter(j=>state.saved.includes(j.id));
  if(state.tab==='applied') arr=arr.filter(j=>state.applied.includes(j.id));
@@ -211,7 +216,7 @@ function render(){
      ${['Not Applied','Saved','Applied','Assessment','Interview','Offer','Rejected'].map(s=>`<option ${s===stat?'selected':''}>${s}</option>`).join('')}
    </select></td>
    <td class="company">${esc(j.company)}</td>
-   <td class="role"><a href="${esc(j.url)}" target="_blank" rel="noopener">${esc(j.title)}</a>${j.new?' <span class="badge">NEW</span>':''}${j.direct?' <span class="badge" style="background:#e6f7f3;color:#067a6f">DIRECT</span>':''}${j.boutique?' <span class="badge">SPECIALIST</span>':''}</td>
+   <td class="role"><a href="${esc(j.url)}" target="_blank" rel="noopener">${esc(j.title)}</a>${j.new?' <span class="badge">NEW</span>':''}${j.verifiedAt?' <span class="badge">CHECKED '+esc(j.verifiedAt)+'</span>':''}${j.archived?' <span class="badge">ARCHIVED</span>':''}${j.direct?' <span class="badge" style="background:#e6f7f3;color:#067a6f">DIRECT</span>':''}${j.boutique?' <span class="badge">SPECIALIST</span>':''}</td>
    <td>${esc(j.category||'')}</td>
    <td class="open">${esc(openingDate(j))}</td>
    <td class="${j.deadline?'closing':''}">${esc(closingDate(j)||'—')}</td>
@@ -264,6 +269,8 @@ async function boot(){
   }catch(e){}
  }
  try{if(location.protocol!=='file:'){const r=await fetch('employers.json?ts='+Date.now(),{cache:'no-store'});if(r.ok)employers=await r.json()}}catch(e){}
+ const ids=new Set(jobs.map(j=>j.id));
+ Object.values(trackedArchive).forEach(j=>{if(j&&j.id&&!ids.has(j.id)&&(state.saved.includes(j.id)||state.applied.includes(j.id))){jobs.push({...j,archived:true,new:false});ids.add(j.id)}});
  initOptions();switchTab();
 }
 boot();
